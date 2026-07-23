@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concussion Clinical Profile Screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1f4; --card:#ffffff; --ink:#16202e; --muted:#5a6675;
+    --hair:#dde3ea; --hair2:#c9d2dc; --teal:#1f6f78; --teal-d:#155056;
+    --flag:#b02a37; --flag-bg:#fdecee;
+    --ocular:#e0607a; --vestibular:#e79a3c; --cognitive:#d8b52c;
+    --fatigue:#4ca36a; --mood:#8a6fbf; --headache:#4f8fce;
+    --shadow:0 1px 2px rgba(20,32,46,.06),0 6px 20px rgba(20,32,46,.07);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Barlow",system-ui,-apple-system,sans-serif;
+    line-height:1.45; -webkit-font-smoothing:antialiased;
+    padding:26px 18px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* ---- Header ---- */
+  header.masthead{
+    background:var(--ink);color:#fff;border-radius:14px;
+    padding:22px 26px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  header.masthead::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120px 120px at 88% -10%, rgba(79,143,206,.30), transparent 70%),
+      radial-gradient(140px 140px at 100% 120%, rgba(76,163,106,.22), transparent 70%);
+  }
+  .eyebrow{
+    font-family:"Barlow Semi Condensed";font-weight:600;letter-spacing:.16em;
+    text-transform:uppercase;font-size:12px;color:#9fb4c9;margin:0 0 4px;
+  }
+  header.masthead h1{
+    font-family:"Barlow Semi Condensed";font-weight:700;font-size:clamp(24px,3.4vw,34px);
+    margin:0;line-height:1.05;letter-spacing:.01em;
+  }
+  header.masthead p.sub{margin:8px 0 0;color:#c4d0dc;font-size:14px;max-width:60ch}
+
+  /* ---- Patient bar ---- */
+  .patient{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:12px;
+    background:var(--card);border:1px solid var(--hair);border-radius:12px;
+    padding:14px 16px;margin-top:14px;box-shadow:var(--shadow);
+  }
+  .field{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .field label{
+    font-family:"Barlow Semi Condensed";font-weight:600;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .field input{
+    border:none;border-bottom:1.5px solid var(--hair2);background:transparent;
+    font-family:inherit;font-size:15px;color:var(--ink);padding:4px 2px;
+  }
+  .field input:focus{outline:none;border-bottom-color:var(--teal)}
+
+  /* ---- Layout ---- */
+  .grid{display:grid;grid-template-columns:1fr 460px;gap:20px;margin-top:20px;align-items:start}
+  .panel{background:var(--card);border:1px solid var(--hair);border-radius:12px;box-shadow:var(--shadow)}
+  .panel-head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    padding:16px 18px 10px;border-bottom:1px solid var(--hair);
+  }
+  .panel-head h2{
+    font-family:"Barlow Semi Condensed";font-weight:700;font-size:16px;letter-spacing:.04em;
+    text-transform:uppercase;margin:0;
+  }
+  .panel-head .hint{font-size:12.5px;color:var(--muted)}
+
+  /* ---- Symptom rows ---- */
+  .scale-key{
+    display:flex;justify-content:space-between;padding:10px 18px 4px;
+    font-size:11.5px;color:var(--muted);font-family:"Barlow Semi Condensed";
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .rows{padding:4px 6px 10px}
+  .row{
+    display:grid;grid-template-columns:1fr 168px 30px;align-items:center;gap:12px;
+    padding:9px 12px;border-radius:8px;
+  }
+  .row:nth-child(odd){background:#f6f8fa}
+  .row .name{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:500}
+  .dots{display:inline-flex;gap:3px;flex:0 0 auto}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+    background:var(--hair2);outline:none;margin:0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--card);border:3px solid var(--teal);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:var(--card);
+    border:3px solid var(--teal);cursor:pointer;
+  }
+  .val{
+    font-family:"Barlow Semi Condensed";font-weight:700;font-size:16px;text-align:center;
+    color:var(--muted);
+  }
+  .row[data-active="1"] .val{color:var(--teal-d)}
+
+  /* ---- Right column ---- */
+  .flowerwrap{padding:12px 12px 4px}
+  svg.flower{width:100%;height:auto;display:block}
+  .petal{transition:fill-opacity .18s ease, stroke-width .18s ease}
+  .plabel{font-family:"Barlow Semi Condensed";font-weight:700;font-size:13px;letter-spacing:.02em;fill:var(--ink)}
+  .ppct{font-family:"Barlow Semi Condensed";font-weight:700;font-size:15px;}
+
+  .totals{display:flex;gap:10px;padding:6px 16px 16px}
+  .stat{
+    flex:1;background:#f6f8fa;border:1px solid var(--hair);border-radius:10px;padding:10px 12px;text-align:center;
+  }
+  .stat .n{font-family:"Barlow Semi Condensed";font-weight:700;font-size:26px;line-height:1}
+  .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;
+    font-family:"Barlow Semi Condensed";font-weight:600}
+
+  /* ---- Results ---- */
+  #results{margin-top:20px}
+  .empty{padding:20px 18px;color:var(--muted);font-size:14px}
+  .prof{
+    border-left:5px solid var(--c);padding:13px 16px;border-bottom:1px solid var(--hair);
+  }
+  .prof:last-child{border-bottom:none}
+  .prof.dim{opacity:.5}
+  .prof-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .prof-name{font-family:"Barlow Semi Condensed";font-weight:700;font-size:16px;letter-spacing:.02em}
+  .prof-name .tag{
+    display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:#fff;background:var(--c);border-radius:20px;padding:2px 8px;margin-left:8px;vertical-align:middle;
+  }
+  .bar{height:7px;border-radius:6px;background:var(--hair);margin:9px 0 4px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:var(--c);border-radius:6px;width:0;transition:width .25s ease}
+  .prof-load{font-family:"Barlow Semi Condensed";font-weight:700;font-size:14px;color:var(--muted)}
+  .prof-detail{font-size:13px;color:var(--ink);margin-top:7px}
+  .prof-detail b{font-family:"Barlow Semi Condensed";font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;font-size:11px;color:var(--muted);display:block;margin-top:6px}
+
+  .flag{
+    display:none;margin-top:20px;background:var(--flag-bg);border:1px solid #f2c2c8;
+    border-left:5px solid var(--flag);border-radius:12px;padding:14px 16px;
+  }
+  .flag h3{margin:0 0 4px;color:var(--flag);font-family:"Barlow Semi Condensed";font-weight:700;
+    font-size:14px;letter-spacing:.03em;text-transform:uppercase}
+  .flag p{margin:0;font-size:13px;color:#7a2029}
+
+  .standing{
+    margin-top:20px;background:var(--card);border:1px solid var(--hair);border-radius:12px;
+    padding:14px 16px;box-shadow:var(--shadow);
+  }
+  .standing h3{margin:0 0 8px;font-family:"Barlow Semi Condensed";font-weight:700;font-size:13px;
+    letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .standing ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink)}
+  .standing li{margin:3px 0}
+
+  /* ---- Actions ---- */
+  .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{
+    font-family:"Barlow Semi Condensed";font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    font-size:13px;border-radius:9px;padding:11px 18px;cursor:pointer;border:1.5px solid transparent;
+  }
+  .btn-print{background:var(--teal);color:#fff}
+  .btn-print:hover{background:var(--teal-d)}
+  .btn-reset{background:transparent;color:var(--muted);border-color:var(--hair2)}
+  .btn-reset:hover{color:var(--ink);border-color:var(--muted)}
+
+  .disclaimer{margin-top:22px;font-size:12px;color:var(--muted);line-height:1.55;max-width:90ch}
+
+  @media(max-width:940px){
+    .grid{grid-template-columns:1fr}
+    .patient{grid-template-columns:1fr 1fr}
+    .right{position:static !important}
+  }
+  @media(min-width:941px){
+    .right{position:sticky;top:18px}
+  }
+
+  /* ---- Tabs ---- */
+  .tabs{display:flex;gap:6px;margin-top:16px;background:var(--card);border:1px solid var(--hair);
+    border-radius:11px;padding:5px;box-shadow:var(--shadow)}
+  .tab{
+    flex:1;text-align:center;font-family:"Barlow Semi Condensed";font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;font-size:13.5px;padding:11px 8px;border-radius:8px;cursor:pointer;
+    color:var(--muted);border:none;background:transparent;
+  }
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .view[hidden]{display:none}
+
+  /* ---- Return to play ---- */
+  .rtp-intro{
+    background:var(--card);border:1px solid var(--hair);border-left:5px solid var(--teal);
+    border-radius:12px;padding:14px 18px;margin-top:20px;box-shadow:var(--shadow);
+  }
+  .rtp-intro h2{font-family:"Barlow Semi Condensed";font-weight:700;font-size:16px;letter-spacing:.03em;
+    text-transform:uppercase;margin:0 0 6px}
+  .rtp-intro p{margin:4px 0;font-size:13.5px;color:var(--ink)}
+  .rtp-intro .gate{font-weight:600}
+  .gate-num{display:inline-block;background:var(--teal);color:#fff;border-radius:6px;padding:1px 8px;font-weight:700}
+
+  #rtp-banner{
+    margin-top:16px;border-radius:12px;padding:14px 18px;color:#fff;box-shadow:var(--shadow);
+    font-family:"Barlow Semi Condensed";font-weight:600;letter-spacing:.02em;
+    display:flex;align-items:center;gap:12px;background:var(--muted);
+  }
+  #rtp-banner .big{font-size:18px;font-weight:700}
+  #rtp-banner.hold{background:#b06a1f}
+  #rtp-banner.go{background:var(--teal-d)}
+  #rtp-banner.done{background:var(--fatigue)}
+  #rtp-banner.wait{background:#5a6675}
+
+  .stages{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+  .stage{
+    display:grid;grid-template-columns:58px 1fr;background:var(--card);border:1px solid var(--hair);
+    border-radius:12px;box-shadow:var(--shadow);overflow:hidden;
+  }
+  .stage-rail{
+    background:#f6f8fa;border-right:1px solid var(--hair);display:flex;align-items:center;justify-content:center;
+  }
+  .stage-num{
+    font-family:"Barlow Semi Condensed";font-weight:700;font-size:24px;color:var(--muted);
+    width:38px;height:38px;border-radius:50%;border:2px solid var(--hair2);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stage[data-state="clear"] .stage-rail{background:#eaf5ee}
+  .stage[data-state="clear"] .stage-num{border-color:var(--fatigue);color:var(--fatigue)}
+  .stage[data-state="hold"] .stage-rail{background:#fbeede}
+  .stage[data-state="hold"] .stage-num{border-color:#b06a1f;color:#b06a1f}
+  .stage[data-state="current"] .stage-num{border-color:var(--teal);color:var(--teal-d)}
+  .stage-body{padding:13px 16px}
+  .stage-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .stage-cat{font-family:"Barlow Semi Condensed";font-weight:600;font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--muted)}
+  .stage-head h3{margin:1px 0 0;font-family:"Barlow",sans-serif;font-weight:600;font-size:16px}
+  .chip{
+    flex:0 0 auto;font-family:"Barlow Semi Condensed";font-weight:700;font-size:10.5px;letter-spacing:.06em;
+    text-transform:uppercase;padding:4px 10px;border-radius:20px;background:var(--hair);color:var(--muted);white-space:nowrap;
+  }
+  .chip.clear{background:#eaf5ee;color:#2f7d4c}
+  .chip.hold{background:#fbeede;color:#9a5a13}
+  .chip.current{background:#e2eff1;color:var(--teal-d)}
+  .stage-inputs{
+    display:grid;grid-template-columns:120px 1fr 1fr 1.4fr;gap:12px;margin-top:11px;align-items:end;
+  }
+  .rtp-field{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .rtp-field label{font-family:"Barlow Semi Condensed";font-weight:600;font-size:10.5px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--muted)}
+  .rtp-field input{
+    border:none;border-bottom:1.5px solid var(--hair2);background:transparent;font-family:inherit;
+    font-size:15px;color:var(--ink);padding:4px 2px;width:100%;
+  }
+  .rtp-field input:focus{outline:none;border-bottom-color:var(--teal)}
+  .sev-field{position:relative}
+  .sev-field .from{
+    position:absolute;right:0;bottom:5px;font-size:9px;letter-spacing:.05em;text-transform:uppercase;
+    font-family:"Barlow Semi Condensed";font-weight:700;color:var(--teal);background:none;border:none;
+    padding:0;cursor:pointer;
+  }
+  .sev-field .from:hover{color:var(--teal-d);text-decoration:underline}
+  .stage-msg{margin:11px 0 0;font-size:13px;color:var(--ink);padding-left:2px}
+  .stage-msg b{color:var(--ink)}
+
+  @media(max-width:640px){.stage-inputs{grid-template-columns:1fr 1fr}}
+
+  /* ---- Print ---- */
+  @media print{
+    .tabs{display:none}
+    #rtp-banner{color:#000;background:#fff !important;border:1px solid #000}
+    .sev-field .from{display:none}
+    .stage,.rtp-intro{break-inside:avoid}
+    body{background:#fff;padding:0;font-size:12px}
+    header.masthead{background:#fff;color:#000;box-shadow:none;border:1px solid #000;border-radius:0}
+    header.masthead::after{display:none}
+    .eyebrow{color:#333}.masthead p.sub{color:#333}
+    .actions,.scale-key .k2{display:none}
+    .panel,.patient,.standing{box-shadow:none;break-inside:avoid}
+    .grid{grid-template-columns:1fr 1fr}
+    input[type=range]{display:none}
+    .row{grid-template-columns:1fr 30px}
+    .row .name{gap:6px}
+    .prof{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Athletic Training &middot; Concussion Management</p>
+    <h1>Concussion Clinical Profile Screen</h1>
+    <p class="sub">Rate each symptom 0 (none) to 6 (severe). Scores map onto the six concussion clinical profiles to point toward the profile(s) most active and the targeted evaluation and rehab each one calls for.</p>
+  </header>
+
+  <div class="patient">
+    <div class="field"><label>Athlete</label><input type="text" id="pt-name" placeholder="Name"></div>
+    <div class="field"><label>Sport / Team</label><input type="text" id="pt-sport" placeholder="Sport"></div>
+    <div class="field"><label>Date of Injury</label><input type="date" id="pt-doi"></div>
+    <div class="field"><label>Eval Date</label><input type="date" id="pt-date"></div>
+    <div class="field"><label>ATC Initials</label><input type="text" id="pt-atc" placeholder="––"></div>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" id="tab-screen" role="tab" aria-selected="true" onclick="showView('screen')">Symptom Screen</button>
+    <button class="tab" id="tab-rtp" role="tab" aria-selected="false" onclick="showView('rtp')">Return to Play</button>
+  </nav>
+
+  <section id="view-screen" class="view">
+  <div class="grid">
+
+    <!-- LEFT: symptom sliders -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Symptom Inventory</h2>
+        <span class="hint">Colored dots = profile(s) each symptom feeds</span>
+      </div>
+      <div class="scale-key">
+        <span>0 — None</span><span class="k2">Rate current severity</span><span>6 — Severe</span>
+      </div>
+      <div class="rows" id="rows"></div>
+    </section>
+
+    <!-- RIGHT: flower + results -->
+    <div class="right">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Clinical Profile Map</h2>
+          <span class="hint">Petal fill = symptom load</span>
+        </div>
+        <div class="flowerwrap">
+          <svg class="flower" viewBox="0 0 520 520" id="flower" role="img" aria-label="Concussion clinical profile flower"></svg>
+        </div>
+        <div class="totals">
+          <div class="stat"><div class="n" id="t-count">0</div><div class="l">Symptoms Present</div></div>
+          <div class="stat"><div class="n" id="t-sev">0</div><div class="l">Severity Score</div></div>
+        </div>
+      </section>
+
+      <section class="panel" id="results"></section>
+
+      <div class="flag" id="flag">
+        <h3>Physician referral indicated</h3>
+        <p id="flag-text"></p>
+      </div>
+
+      <div class="standing">
+        <h3>Standing recommendations (all profiles)</h3>
+        <ul>
+          <li>Counsel on expectation of recovery; monitor for exacerbation of pre-existing conditions.</li>
+          <li>Sleep hygiene.</li>
+          <li>Sub-symptom threshold aerobic exercise once tolerated.</li>
+        </ul>
+      </div>
+
+      <div class="actions">
+        <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn-reset" id="reset">Reset scores</button>
+      </div>
+    </div>
+  </div>
+  </section><!-- /view-screen -->
+
+  <section id="view-rtp" class="view" hidden>
+    <div class="rtp-intro">
+      <h2>Graded Return-to-Play Protocol</h2>
+      <p class="gate">Gate to begin: symptom severity score must be below <span class="gate-num">5</span> at rest before Stage 1.</p>
+      <p>Record symptoms <b>PRE</b> (before activity) and <b>POST</b> (after activity) at each stage. Allow the athlete up to <b>30 minutes</b> after the activity before the POST check, so any exertion spike has a chance to settle. A stage clears only when <b>POST does not exceed PRE</b> — no symptom increase. Keep stages at least 24 hours apart; if symptoms rise, stop, rest 24 hours, and repeat the stage. <b>Full clearance at Stage 5 requires the athlete to be symptom-free (0).</b></p>
+    </div>
+
+    <div id="rtp-banner"><span class="big" id="rtp-banner-big">—</span><span id="rtp-banner-sub"></span></div>
+
+    <div class="stages" id="rtp-stages"></div>
+
+    <div class="actions">
+      <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+      <button class="btn-reset" id="rtp-reset">Reset protocol</button>
+    </div>
+
+    <p class="disclaimer" style="margin-top:18px">
+      Progression logic reflects the below-5 start gate, the rule that POST must not exceed PRE at any stage, the 30-minute post-activity settling window, and symptom-free (0) required for full clearance. Final return-to-play clearance after Stage 5 requires physician sign-off and must follow your district and Illinois state protocol.
+    </p>
+  </section><!-- /view-rtp -->
+
+  <p class="disclaimer">
+    Decision-support aid for a certified athletic trainer, not a diagnostic instrument. Symptom-to-profile mapping follows the concussion clinical-profiles framework; a single profile rarely acts alone and overlap between adjacent profiles is expected. Diagnosis, return-to-learn and return-to-play decisions require physician oversight and must follow your district and state concussion protocol.
+  </p>
+</div>
+
+<script>
+/* ---------- profile definitions ---------- */
+const P = {
+  ocular:     {name:"Ocular",           color:"#e0607a", angle:300,
+    exam:"Near point convergence, accommodation, smooth pursuits, saccades; symptom provocation with visual tasks.",
+    tx:"Vision / oculomotor rehab; lens changes."},
+  vestibular: {name:"Vestibular",       color:"#e79a3c", angle:0,
+    exam:"Balance & gait, VOR, visual-motion sensitivity, vestibular testing.",
+    tx:"Graded exposure to stimuli; vestibular rehab."},
+  cognitive:  {name:"Cognitive",        color:"#d8b52c", angle:60,
+    exam:"Orientation, in-office cognitive testing; screen for slowed processing.",
+    tx:"Academic modifications; formal neurocognitive evaluation / rehab."},
+  fatigue:    {name:"Fatigue",          color:"#4ca36a", angle:120,
+    exam:"Tired/subdued appearance, somnolence, decreased arousal.",
+    tx:"Graded exertional tolerance training; CBT if it becomes chronic."},
+  mood:       {name:"Anxiety–Mood",     color:"#8a6fbf", angle:180,
+    exam:"Agitation, anxiety, flat affect, tearfulness.",
+    tx:"Maintain social engagement; mental-health counseling; CBT."},
+  headache:   {name:"Headache–Migraine",color:"#4f8fce", angle:240,
+    exam:"Occipital / neck tenderness, tight neck muscles, light-avoidance.",
+    tx:"Manual therapy; treatment of the headache disorder."}
+};
+const ORDER = ["ocular","vestibular","cognitive","fatigue","mood","headache"];
+
+/* ---------- symptoms (SCAT-style) mapped to profiles ---------- */
+const SYMPTOMS = [
+  ["Headache",["headache","ocular"]],
+  ['"Pressure in head"',["headache"]],
+  ["Neck pain",["headache"]],
+  ["Nausea or vomiting",["ocular","vestibular","headache"]],
+  ["Dizziness",["ocular","vestibular"]],
+  ["Blurred vision",["ocular"]],
+  ["Balance problems",["vestibular"]],
+  ["Sensitivity to light",["ocular","headache"]],
+  ["Sensitivity to noise",["headache"]],
+  ["Feeling slowed down",["cognitive","fatigue"]],
+  ['Feeling like "in a fog"',["vestibular","cognitive"]],
+  ['"Don\'t feel right"',[]],
+  ["Difficulty concentrating",["cognitive"]],
+  ["Difficulty remembering",["cognitive"]],
+  ["Fatigue or low energy",["cognitive","fatigue"]],
+  ["Confusion",["cognitive"]],
+  ["Drowsiness",["fatigue","mood"]],
+  ["Trouble falling asleep",["fatigue","mood"]],
+  ["Sleeping more than usual",["fatigue"]],
+  ["Sleeping less than usual",["fatigue","mood"]],
+  ["More emotional",["mood"]],
+  ["Irritability",["mood"]],
+  ["Sadness",["mood"]],
+  ["Nervous or anxious",["mood"]],
+  ["Numbness or tingling",[]]   // red-flag / neuro monitor, not a profile
+];
+const ACTIVE = 30;   // % load considered clinically relevant
+
+/* ---------- build symptom rows ---------- */
+const rowsEl = document.getElementById("rows");
+SYMPTOMS.forEach((s,i)=>{
+  const [label,profs]=s;
+  const dots=profs.map(p=>`<span class="dot" style="background:${P[p].color}" title="${P[p].name}"></span>`).join("");
+  const row=document.createElement("div");
+  row.className="row"; row.dataset.i=i;
+  row.innerHTML=`
+    <div class="name"><span class="dots">${dots}</span><span>${label}</span></div>
+    <input type="range" min="0" max="6" step="1" value="0" data-i="${i}" aria-label="${label.replace(/"/g,'')}">
+    <div class="val" id="v${i}">0</div>`;
+  rowsEl.appendChild(row);
+});
+
+/* ---------- build flower svg ---------- */
+const CX=260, CY=260, svg=document.getElementById("flower");
+const NS="http://www.w3.org/2000/svg";
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+// petals
+ORDER.forEach(k=>{
+  const g=el("g",{transform:`rotate(${P[k].angle} ${CX} ${CY})`});
+  const e=el("ellipse",{cx:CX,cy:158,rx:96,ry:150,fill:P[k].color,"fill-opacity":.06,
+    stroke:P[k].color,"stroke-width":1.2,class:"petal",id:"petal-"+k,"stroke-opacity":.55});
+  g.appendChild(e); svg.appendChild(g);
+});
+// center marker
+svg.appendChild(el("circle",{cx:CX,cy:CY,r:30,fill:"#fff","fill-opacity":.75,stroke:"#c9d2dc","stroke-width":1}));
+const ctr=el("text",{x:CX,y:CY+4,"text-anchor":"middle","font-family":"Barlow Semi Condensed","font-weight":700,"font-size":11,fill:"#5a6675"});
+ctr.textContent="SCAT"; svg.appendChild(ctr);
+// upright labels + pct
+ORDER.forEach(k=>{
+  const a=P[k].angle*Math.PI/180;
+  const lx=CX+215*Math.sin(a), ly=CY-215*Math.cos(a);
+  const t=el("text",{x:lx,y:ly,"text-anchor":"middle",class:"plabel"});
+  t.textContent=P[k].name; svg.appendChild(t);
+  const px=CX+118*Math.sin(a), py=CY-118*Math.cos(a);
+  const pt=el("text",{x:px,y:py+5,"text-anchor":"middle",class:"ppct",id:"pct-"+k,fill:P[k].color,opacity:0});
+  svg.appendChild(pt);
+});
+
+const resultsEl=document.getElementById("results");
+const flagEl=document.getElementById("flag");
+const flagText=document.getElementById("flag-text");
+
+/* ---------- render ---------- */
+function render(){
+  const vals=SYMPTOMS.map((_,i)=>+document.querySelector(`input[data-i="${i}"]`).value);
+  // per-profile load
+  const load={}, cnt={};
+  ORDER.forEach(k=>{load[k]=0;cnt[k]=0;});
+  SYMPTOMS.forEach((s,i)=>{
+    s[1].forEach(k=>{load[k]+=vals[i];cnt[k]++;});
+    document.getElementById("v"+i).textContent=vals[i];
+    document.querySelector(`.row[data-i="${i}"]`).dataset.active = vals[i]>0?1:0;
+  });
+  const pct={};
+  ORDER.forEach(k=>{pct[k]=cnt[k]?Math.round(load[k]/(cnt[k]*6)*100):0;});
+
+  // totals
+  const count=vals.filter(v=>v>0).length;
+  const sev=vals.reduce((a,b)=>a+b,0);
+  document.getElementById("t-count").textContent=count;
+  document.getElementById("t-sev").textContent=sev;
+
+  // flower
+  ORDER.forEach(k=>{
+    const op=0.06+(pct[k]/100)*0.82;
+    const pe=document.getElementById("petal-"+k);
+    pe.setAttribute("fill-opacity",op.toFixed(3));
+    pe.setAttribute("stroke-width", pct[k]>=ACTIVE?3:1.2);
+    const pt=document.getElementById("pct-"+k);
+    pt.textContent=pct[k]+"%";
+    pt.setAttribute("opacity", pct[k]>0?1:0);
+    pt.setAttribute("fill", pct[k]>=ACTIVE?"#16202e":P[k].color);
+  });
+
+  // ranked results
+  const ranked=ORDER.slice().sort((a,b)=>pct[b]-pct[a]);
+  const top=pct[ranked[0]];
+  if(top===0){
+    resultsEl.innerHTML=`<div class="panel-head"><h2>Guidance</h2></div>
+      <div class="empty">Enter symptom scores to map the active clinical profile(s) and see the targeted evaluation and rehab each one calls for.</div>`;
+  } else {
+    let html=`<div class="panel-head"><h2>Profile Guidance</h2><span class="hint">ranked by load</span></div>`;
+    ranked.forEach(k=>{
+      const active=pct[k]>=ACTIVE, primary=pct[k]===top && active;
+      html+=`<div class="prof ${active?'':'dim'}" style="--c:${P[k].color}">
+        <div class="prof-top">
+          <span class="prof-name">${P[k].name}${primary?'<span class="tag">Primary</span>':(active?'<span class="tag">Active</span>':'')}</span>
+          <span class="prof-load">${pct[k]}%</span>
+        </div>
+        <div class="bar"><i style="width:${pct[k]}%"></i></div>`;
+      if(active){
+        html+=`<div class="prof-detail">
+          <b>Evaluate</b>${P[k].exam}
+          <b>Targeted rehab</b>${P[k].tx}</div>`;
+      }
+      html+=`</div>`;
+    });
+    resultsEl.innerHTML=html;
+  }
+
+  // red flags
+  const numb=vals[24]; // numbness or tingling
+  const flags=[];
+  if(numb>=1) flags.push("numbness or tingling");
+  if(vals[3]>=4) flags.push("prominent nausea/vomiting");
+  if(vals[0]>=6) flags.push("severe or worsening headache");
+  if(vals[15]>=4) flags.push("increasing confusion");
+  if(flags.length){
+    flagEl.style.display="block";
+    flagText.textContent="Present: "+flags.join(", ")+". Re-check cervical spine and neuro status, monitor closely, and escalate to a physician / emergency evaluation if any red-flag sign is deteriorating.";
+  } else flagEl.style.display="none";
+}
+
+/* ---------- events ---------- */
+document.querySelectorAll('input[type=range]').forEach(r=>r.addEventListener('input',render));
+document.getElementById("reset").addEventListener("click",()=>{
+  document.querySelectorAll('input[type=range]').forEach(r=>r.value=0);
+  render();
+});
+/* ---------- view switching ---------- */
+function showView(v){
+  document.getElementById("view-screen").hidden = v!=="screen";
+  document.getElementById("view-rtp").hidden = v!=="rtp";
+  document.getElementById("tab-screen").setAttribute("aria-selected", v==="screen");
+  document.getElementById("tab-rtp").setAttribute("aria-selected", v==="rtp");
+}
+function currentSeverity(){
+  return SYMPTOMS.reduce((a,_,i)=>a+(+document.querySelector(`input[data-i="${i}"]`).value),0);
+}
+
+/* ---------- return-to-play protocol ---------- */
+const THRESH = 5;            // severity must stay BELOW this
+const STAGES = [
+  {cat:"Light aerobic",        act:"15-minute stationary bike"},
+  {cat:"Light aerobic +",      act:"15-minute bike + 10-minute elliptical"},
+  {cat:"Interval training",    act:"HIIT-style workout"},
+  {cat:"Non-contact",          act:"Non-contact practice or another HIIT-style workout"},
+  {cat:"Full contact",         act:"Full practice"}
+];
+
+const stagesEl=document.getElementById("rtp-stages");
+STAGES.forEach((s,i)=>{
+  const c=document.createElement("div");
+  c.className="stage"; c.dataset.n=i;
+  c.innerHTML=`
+    <div class="stage-rail"><span class="stage-num">${i+1}</span></div>
+    <div class="stage-body">
+      <div class="stage-head">
+        <div><span class="stage-cat">Day ${i+1} &middot; ${s.cat}</span><h3>${s.act}</h3></div>
+        <span class="chip" id="chip-${i}">Awaiting</span>
+      </div>
+      <div class="stage-inputs">
+        <div class="rtp-field"><label>Date</label><input type="date" data-rtp="date" data-n="${i}"></div>
+        <div class="rtp-field sev-field"><label>PRE severity</label>
+          <input type="number" min="0" max="150" inputmode="numeric" data-rtp="pre" data-n="${i}" placeholder="—">
+          <button class="from" data-fill="pre" data-n="${i}">use screen</button></div>
+        <div class="rtp-field sev-field"><label>POST severity</label>
+          <input type="number" min="0" max="150" inputmode="numeric" data-rtp="post" data-n="${i}" placeholder="—">
+          <button class="from" data-fill="post" data-n="${i}">use screen</button></div>
+        <div class="rtp-field"><label>Notes</label><input type="text" data-rtp="note" data-n="${i}" placeholder="Response, symptoms, etc."></div>
+      </div>
+      <p class="stage-msg" id="msg-${i}"></p>
+    </div>`;
+  stagesEl.appendChild(c);
+});
+
+function num(el){const v=el.value.trim();return v===""?null:+v;}
+
+function renderRTP(){
+  let currentStage=-1, holding=false, complete=false;
+  let prevCleared=true;   // stage 1 gate is the severity rule itself
+
+  STAGES.forEach((s,i)=>{
+    const isFinal = i===STAGES.length-1;
+    const preEl=document.querySelector(`input[data-rtp="pre"][data-n="${i}"]`);
+    const postEl=document.querySelector(`input[data-rtp="post"][data-n="${i}"]`);
+    const pre=num(preEl), post=num(postEl);
+    const card=document.querySelector(`.stage[data-n="${i}"]`);
+    const chip=document.getElementById("chip-"+i);
+    const msg=document.getElementById("msg-"+i);
+    let state="await", chipTxt="Awaiting", chipCls="", text="";
+
+    // exertion gate: stages 1-4 require PRE below 5; stage 5 (full clearance) requires symptom-free
+    const gateFail = isFinal ? (pre!==null && pre>0) : (pre!==null && pre>=THRESH);
+
+    if(!prevCleared){
+      state="await"; chipTxt="Locked"; chipCls="";
+      text="Clear the previous stage first.";
+    } else if(pre===null){
+      state=(currentStage===-1)?"current":"await";
+      chipTxt=(currentStage===-1)?"Current":"Awaiting";
+      chipCls=(currentStage===-1)?"current":"";
+      text=isFinal
+        ? "Full clearance requires the athlete to be symptom-free. Confirm severity is 0 at rest, then record the PRE score."
+        : `Confirm severity is below ${THRESH} at rest, then record the PRE score.`;
+      if(currentStage===-1) currentStage=i;
+    } else if(gateFail){
+      state="hold"; chipTxt="Not cleared"; chipCls="hold";
+      text=isFinal
+        ? `PRE severity is ${pre} — full clearance requires symptom-free. Hold at Stage 4 level until symptoms fully resolve (0).`
+        : `PRE severity is ${pre} — at or above ${THRESH}. Do not begin exertion. Rest and re-screen until below ${THRESH}.`;
+      if(currentStage===-1){currentStage=i;holding=true;}
+    } else if(post===null){
+      state="current"; chipTxt="In progress"; chipCls="current";
+      text=`PRE ${pre} — cleared to exert. Complete <b>${s.act.toLowerCase()}</b>, wait up to 30 min for any spike to settle, then record the POST score.`;
+      if(currentStage===-1) currentStage=i;
+    } else if(post>pre){
+      state="hold"; chipTxt="Provoked"; chipCls="hold";
+      text=`POST ${post} exceeds PRE ${pre} — symptoms increased with exertion. Stop, rest 24 h, and repeat this stage before advancing.`;
+      if(currentStage===-1){currentStage=i;holding=true;}
+    } else {
+      state="clear"; chipTxt="Cleared"; chipCls="clear";
+      const delta=pre-post;
+      const drop=delta>0?` (down ${delta} from PRE)`:"";
+      text=isFinal
+        ? `PRE 0 / POST ${post} — symptom-free through full practice. Return-to-play criteria met; final clearance per physician & district protocol.`
+        : `PRE ${pre} / POST ${post} — no increase${drop}. Advance after 24 h.`;
+    }
+
+    card.dataset.state=state;
+    chip.textContent=chipTxt;
+    chip.className="chip"+(chipCls?(" "+chipCls):"");
+    msg.innerHTML=text;
+
+    prevCleared = (state==="clear");
+    if(isFinal && state==="clear") complete=true;
+  });
+
+  // banner
+  const b=document.getElementById("rtp-banner");
+  const big=document.getElementById("rtp-banner-big");
+  const sub=document.getElementById("rtp-banner-sub");
+  b.className="";
+  if(complete){
+    b.classList.add("done");
+    big.textContent="Fully cleared";
+    sub.textContent="Symptom-free through full practice — return-to-play criteria met. Final clearance per physician & district protocol.";
+  } else if(currentStage===-1){
+    b.classList.add("wait");
+    big.textContent="Not started";
+    sub.textContent=`Begin Stage 1 once resting severity is below ${THRESH}.`;
+  } else if(holding){
+    b.classList.add("hold");
+    big.textContent=`Holding at Stage ${currentStage+1}`;
+    sub.textContent="Rest 24 h and repeat this stage before advancing.";
+  } else {
+    b.classList.add("go");
+    big.textContent=`Stage ${currentStage+1} of 5`;
+    sub.textContent=`${STAGES[currentStage].act}.`;
+  }
+}
+
+// wire rtp inputs
+document.querySelectorAll('#rtp-stages input[data-rtp="pre"],#rtp-stages input[data-rtp="post"]')
+  .forEach(el=>el.addEventListener('input',renderRTP));
+document.querySelectorAll('#rtp-stages .from').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const n=btn.dataset.n, which=btn.dataset.fill;
+    const el=document.querySelector(`input[data-rtp="${which}"][data-n="${n}"]`);
+    el.value=currentSeverity(); renderRTP();
+  });
+});
+document.getElementById("rtp-reset").addEventListener("click",()=>{
+  document.querySelectorAll('#rtp-stages input').forEach(el=>el.value="");
+  renderRTP();
+});
+
+// default eval date = today
+document.getElementById("pt-date").valueAsDate=new Date();
+render();
+renderRTP();
+</script>
+</body>
+</html>
