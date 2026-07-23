@@ -371,7 +371,7 @@
   <section id="view-rtp" class="view" hidden>
     <div class="rtp-intro">
       <h2>Graded Return-to-Play Protocol</h2>
-      <p class="gate">Gate to begin: symptom severity score must be below <span class="gate-num">5</span> at rest before Stage 1.</p>
+      <p class="gate">Gate to begin: symptom severity score must be <span class="gate-num">5</span> or below at rest before Stage 1.</p>
       <p>Record symptoms <b>PRE</b> (before activity) and <b>POST</b> (after activity) at each stage. Allow the athlete up to <b>30 minutes</b> after the activity before the POST check, so any exertion spike has a chance to settle. A stage clears only when <b>POST does not exceed PRE</b> — no symptom increase. Keep stages at least 24 hours apart; if symptoms rise, stop, rest 24 hours, and repeat the stage. <b>Full clearance at Stage 5 requires the athlete to be symptom-free (0).</b></p>
     </div>
 
@@ -385,7 +385,7 @@
     </div>
 
     <p class="disclaimer" style="margin-top:18px">
-      Progression logic reflects the below-5 start gate, the rule that POST must not exceed PRE at any stage, the 30-minute post-activity settling window, and symptom-free (0) required for full clearance. Final return-to-play clearance after Stage 5 requires physician sign-off and must follow your district and Illinois state protocol.
+      Progression logic reflects the start gate of a resting severity score of 5 or below, the rule that POST must not exceed PRE at any stage, the 30-minute post-activity settling window, and symptom-free (0) required for full clearance. Final return-to-play clearance after Stage 5 requires physician sign-off and must follow your district and Illinois state protocol.
     </p>
   </section><!-- /view-rtp -->
 
@@ -632,8 +632,8 @@ function renderRTP(){
     const msg=document.getElementById("msg-"+i);
     let state="await", chipTxt="Awaiting", chipCls="", text="";
 
-    // exertion gate: stages 1-4 require PRE below 5; stage 5 (full clearance) requires symptom-free
-    const gateFail = isFinal ? (pre!==null && pre>0) : (pre!==null && pre>=THRESH);
+    // exertion gate: stages 1-4 require PRE of 5 or below; stage 5 (full clearance) requires symptom-free
+    const gateFail = isFinal ? (pre!==null && pre>0) : (pre!==null && pre>THRESH);
 
     if(!prevCleared){
       state="await"; chipTxt="Locked"; chipCls="";
@@ -644,13 +644,13 @@ function renderRTP(){
       chipCls=(currentStage===-1)?"current":"";
       text=isFinal
         ? "Full clearance requires the athlete to be symptom-free. Confirm severity is 0 at rest, then record the PRE score."
-        : `Confirm severity is below ${THRESH} at rest, then record the PRE score.`;
+        : `Confirm severity is ${THRESH} or below at rest, then record the PRE score.`;
       if(currentStage===-1) currentStage=i;
     } else if(gateFail){
       state="hold"; chipTxt="Not cleared"; chipCls="hold";
       text=isFinal
         ? `PRE severity is ${pre} — full clearance requires symptom-free. Hold at Stage 4 level until symptoms fully resolve (0).`
-        : `PRE severity is ${pre} — at or above ${THRESH}. Do not begin exertion. Rest and re-screen until below ${THRESH}.`;
+        : `PRE severity is ${pre} — above ${THRESH}. Do not begin exertion. Rest and re-screen until ${THRESH} or below.`;
       if(currentStage===-1){currentStage=i;holding=true;}
     } else if(post===null){
       state="current"; chipTxt="In progress"; chipCls="current";
@@ -690,7 +690,7 @@ function renderRTP(){
   } else if(currentStage===-1){
     b.classList.add("wait");
     big.textContent="Not started";
-    sub.textContent=`Begin Stage 1 once resting severity is below ${THRESH}.`;
+    sub.textContent=`Begin Stage 1 once resting severity is ${THRESH} or below.`;
   } else if(holding){
     b.classList.add("hold");
     big.textContent=`Holding at Stage ${currentStage+1}`;
